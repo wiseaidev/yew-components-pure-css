@@ -20,8 +20,14 @@ pub fn login_form_one() -> Html {
     let email_valid_handle = use_state(|| true);
     let email_valid = (*email_valid_handle).clone();
 
+    let eye_active_handle = use_state(|| false);
+    let eye_active = (*eye_active_handle).clone();
+
     let password_valid_handle = use_state(|| true);
     let password_valid = (*password_valid_handle).clone();
+
+    let password_type_handle = use_state(|| "text");
+    let password_type = (*password_type_handle).clone();
 
     let input_email_ref = use_node_ref();
     let input_email_handle = use_state(String::default);
@@ -98,6 +104,18 @@ pub fn login_form_one() -> Html {
         });
     });
 
+    let on_toggle_password = {
+        Callback::from(move |_| {
+            if eye_active {
+                password_type_handle.set("password".into())
+            }
+            else {
+                password_type_handle.set("text".into())
+            }
+            eye_active_handle.set(!eye_active);
+        })
+    };
+
     html! {
         <div class="form-one-content" role="main" aria-label="Sign In Form">
           <div class="text">
@@ -117,7 +135,7 @@ pub fn login_form_one() -> Html {
                 aria-required="true"
                 aria-label="Email"
                 ref={input_email_ref}
-                required=true
+                required={true}
                 oninput={on_email_change}
               />
               <span
@@ -133,15 +151,21 @@ pub fn login_form_one() -> Html {
             <div class="form-one-field">
               <input
                 id="password"
-                type="password"
+                type={&*password_type}
                 name="password"
                 aria-required="true"
                 aria-label="Password"
                 placeholder="Password"
-                required=true
+                required={true}
                 ref={input_password_ref}
                 oninput={on_password_change}
               />
+              <i
+                class={format!("toggle-button fa {}", if eye_active { "fa-eye" } else { "fa-eye-slash " })}
+                aria-hidden="true"
+                role="presentation"
+                onclick={on_toggle_password}
+              ></i>
               <span
                 class="fas fa-lock"
                 aria-hidden="true"

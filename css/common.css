@@ -141,3 +141,13 @@ button:focus {
   box-shadow: 2px 2px 5px #BABECC,
              -5px -5px 10px #ffffff73;
 }
+
+.toggle-button {
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #666;
+}
