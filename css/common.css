@@ -10,7 +10,11 @@
   margin-top: 20px;
   font-size: 16px;
 }
-
+.error-txt {
+  font-size: 14px;
+  color: #ff0000; /* Red color for error text */
+  margin: 10px;
+}
 /*------------------------------Uncomment for form 1------------------------------*/
 
 * {
