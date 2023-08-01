@@ -78,17 +78,22 @@ pub fn login_form_one() -> Html {
             let email_val = email_ref.clone();
             let password_val = password_ref.clone();
             let error_handle = error_handle.clone();
-            let response = login_user(email_val, password_val).await;
-            match response {
-                Ok(_) => {
-                    console::log_1(&"success".into());
-                    let window: Window = web_sys::window().expect("window not available");
-                    let location = window.location();
-                    let _ = location.set_href("/error");
-                }
-                Err(err) => {
-                    error_handle.set(err);
-                }
+            if email_valid && password_valid {
+              let response = login_user(email_val, password_val).await;
+              match response {
+                  Ok(_) => {
+                      console::log_1(&"success".into());
+                      let window: Window = web_sys::window().expect("window not available");
+                      let location = window.location();
+                      let _ = location.set_href("/error");
+                  }
+                  Err(err) => {
+                      error_handle.set(err);
+                  }
+              }
+            }
+            else {
+              error_handle.set("Please provide a valid email and password!".into());
             }
         });
     });
