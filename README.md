@@ -43,7 +43,7 @@ This section lists components implemented using just pure CSS. Pure CSS componen
 
 | ID | Preview | Localhost |
 |---|---|---|
-| 1 | ![Component 1](./assets/form-one.png) | [Localhost](http://localhost:3000/1) |
+| 1 | ![Component 1](./assets/form-one.png) | [![Netlify Status](https://api.netlify.com/api/v1/badges/68d1469e-05ee-4acd-9368-b67d9e53bc2e/deploy-status)](https://pure-css-form-1.netlify.app/) | [Localhost](http://localhost:3000/1) |
 
 ## 🤝 Contributing
 
