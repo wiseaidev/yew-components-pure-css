@@ -1,15 +1,25 @@
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen_futures::spawn_local;
-use web_sys::{console, HtmlInputElement, Window};
+use web_sys::{console, Window};
 use yew::prelude::*;
-use regex::Regex;
 
 use crate::api::auth::login_user;
+use input_yew::CustomInput;
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 struct LoginUserSchema {
     email: String,
     password: String,
+}
+
+fn validate_email(email: String) -> bool {
+    let pattern = Regex::new(r"^[^ ]+@[^ ]+\.[a-z]{2,3}$").unwrap();
+    pattern.is_match(&email)
+}
+
+fn validate_password(password: String) -> bool {
+    !&password.is_empty()
 }
 
 #[function_component(LoginFormOne)]
@@ -20,14 +30,8 @@ pub fn login_form_one() -> Html {
     let email_valid_handle = use_state(|| true);
     let email_valid = (*email_valid_handle).clone();
 
-    let eye_active_handle = use_state(|| false);
-    let eye_active = (*eye_active_handle).clone();
-
     let password_valid_handle = use_state(|| true);
     let password_valid = (*password_valid_handle).clone();
-
-    let password_type_handle = use_state(|| "text");
-    let password_type = (*password_type_handle).clone();
 
     let input_email_ref = use_node_ref();
     let input_email_handle = use_state(String::default);
@@ -36,41 +40,6 @@ pub fn login_form_one() -> Html {
     let input_password_ref = use_node_ref();
     let input_password_handle = use_state(String::default);
     let input_password = (*input_password_handle).clone();
-
-    let validate_email = |email: &str| {
-        let pattern = Regex::new(r"^[^ ]+@[^ ]+\.[a-z]{2,3}$").unwrap();
-        pattern.is_match(email)
-    };
-
-    let validate_password = |password: &str| !password.is_empty();
-
-    let on_email_change = {
-        let input_email_ref = input_email_ref.clone();
-
-        Callback::from(move |_| {
-            let input = input_email_ref.cast::<HtmlInputElement>();
-
-            if let Some(input) = input {
-                let value = input.value();
-                input_email_handle.set(value);
-                email_valid_handle.set(validate_email(&input.value()));
-            }
-        })
-    };
-
-    let on_password_change = {
-        let input_password_ref = input_password_ref.clone();
-
-        Callback::from(move |_| {
-            let input = input_password_ref.cast::<HtmlInputElement>();
-
-            if let Some(input) = input {
-                let value = input.value();
-                input_password_handle.set(value);
-                password_valid_handle.set(validate_password(&input.value()));
-            }
-        })
-    };
 
     let onsubmit = Callback::from(move |event: SubmitEvent| {
         event.prevent_default();
@@ -85,36 +54,23 @@ pub fn login_form_one() -> Html {
             let password_val = password_ref.clone();
             let error_handle = error_handle.clone();
             if email_valid && password_valid {
-              let response = login_user(email_val, password_val).await;
-              match response {
-                  Ok(_) => {
-                      console::log_1(&"success".into());
-                      let window: Window = web_sys::window().expect("window not available");
-                      let location = window.location();
-                      let _ = location.set_href("/error");
-                  }
-                  Err(err) => {
-                      error_handle.set(err);
-                  }
-              }
-            }
-            else {
-              error_handle.set("Please provide a valid email and password!".into());
+                let response = login_user(email_val, password_val).await;
+                match response {
+                    Ok(_) => {
+                        console::log_1(&"success".into());
+                        let window: Window = web_sys::window().expect("window not available");
+                        let location = window.location();
+                        let _ = location.set_href("/error");
+                    }
+                    Err(err) => {
+                        error_handle.set(err);
+                    }
+                }
+            } else {
+                error_handle.set("Please provide a valid email and password!".into());
             }
         });
     });
-
-    let on_toggle_password = {
-        Callback::from(move |_| {
-            if eye_active {
-                password_type_handle.set("password".into())
-            }
-            else {
-                password_type_handle.set("text".into())
-            }
-            eye_active_handle.set(!eye_active);
-        })
-    };
 
     html! {
         <div class="form-one-content" role="main" aria-label="Sign In Form">
@@ -125,57 +81,44 @@ pub fn login_form_one() -> Html {
             }
           </div>
           <form action="#" aria-label="Sign In Form" onsubmit={onsubmit}>
-
-            <div class="form-one-field">
-              <input
-                id="email"
-                type="text"
-                name="username"
-                placeholder="Email"
-                aria-required="true"
-                aria-label="Email"
-                ref={input_email_ref}
+              <CustomInput
+                input_type={Some("text".to_string())}
+                label={"".to_string()}
+                input_handle={input_email_handle}
+                name={"email".to_string()}
+                input_ref={input_email_ref}
+                input_placeholder={"Email".to_string()}
+                icon_class={"fas fa-user".to_string()}
+                error_message={"Enter a valid email address".to_string()}
+                form_input_class={"".to_string()}
+                form_input_field_class={"form-one-field".to_string()}
+                form_input_label_class={"".to_string()}
+                form_input_input_class={"".to_string()}
+                form_input_error_class={"error-txt".to_string()}
                 required={true}
-                oninput={on_email_change}
+                input_valid_handle={email_valid_handle}
+                validate_function={validate_email}
               />
-              <span
-                class="fas fa-user"
-                aria-hidden="true"
-                role="presentation"
-              ></span>
-              // <label for="email">{"Email or Phone"}</label>
-            </div>
-            if !email_valid {
-                <div class="error-txt">{"Enter a valid email address"}</div>
-            }
-            <div class="form-one-field">
-              <input
-                id="password"
-                type={&*password_type}
-                name="password"
-                aria-required="true"
-                aria-label="Password"
-                placeholder="Password"
+              <CustomInput
+                input_type={Some("password".to_string())}
+                label={"".to_string()}
+                input_handle={input_password_handle}
+                name={"password".to_string()}
+                input_ref={input_password_ref}
+                input_placeholder={"Password".to_string()}
+                icon_class={"fas fa-lock".to_string()}
+                error_message={"Password can't be blank!".to_string()}
+                form_input_class={"".to_string()}
+                form_input_field_class={"form-one-field".to_string()}
+                form_input_label_class={"".to_string()}
+                form_input_input_class={"".to_string()}
+                form_input_error_class={"error-txt".to_string()}
                 required={true}
-                ref={input_password_ref}
-                oninput={on_password_change}
+                input_valid_handle={password_valid_handle}
+                validate_function={validate_password}
+                eye_active={"fa fa-eye"}
+                eye_disabled={"fa fa-eye-slash"}
               />
-              <i
-                class={format!("toggle-button fa {}", if eye_active { "fa-eye" } else { "fa-eye-slash " })}
-                aria-hidden="true"
-                role="presentation"
-                onclick={on_toggle_password}
-              ></i>
-              <span
-                class="fas fa-lock"
-                aria-hidden="true"
-                role="presentation"
-              ></span>
-              // <label for="password">{"Password"}</label>
-            </div>
-            if !password_valid {
-               <div class="error-txt">{"Password can't be blank"}</div>
-            }
             <div class="form-one-forgot-pass">
               <a href="#" aria-label="Forgot Password?">{"Forgot Password?"}</a>
             </div>
