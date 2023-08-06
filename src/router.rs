@@ -9,7 +9,7 @@ pub enum Route {
     #[at("/error")]
     Error,
     #[at("/1")]
-    LoginPageOne
+    LoginPageOne,
 }
 
 pub fn switch(routes: Route) -> Html {
