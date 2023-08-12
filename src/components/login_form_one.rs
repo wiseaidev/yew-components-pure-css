@@ -82,36 +82,28 @@ pub fn login_form_one() -> Html {
           </div>
           <form action="#" aria-label="Sign In Form" onsubmit={onsubmit}>
               <CustomInput
-                input_type={Some("text".to_string())}
-                label={"".to_string()}
+                input_type={"text".to_string()}
                 input_handle={input_email_handle}
                 name={"email".to_string()}
                 input_ref={input_email_ref}
                 input_placeholder={"Email".to_string()}
                 icon_class={"fas fa-user".to_string()}
                 error_message={"Enter a valid email address".to_string()}
-                form_input_class={"".to_string()}
                 form_input_field_class={"form-one-field".to_string()}
-                form_input_label_class={"".to_string()}
-                form_input_input_class={"".to_string()}
                 form_input_error_class={"error-txt".to_string()}
                 required={true}
                 input_valid_handle={email_valid_handle}
                 validate_function={validate_email}
               />
               <CustomInput
-                input_type={Some("password".to_string())}
-                label={"".to_string()}
+                input_type={"password".to_string()}
                 input_handle={input_password_handle}
                 name={"password".to_string()}
                 input_ref={input_password_ref}
                 input_placeholder={"Password".to_string()}
                 icon_class={"fas fa-lock".to_string()}
                 error_message={"Password can't be blank!".to_string()}
-                form_input_class={"".to_string()}
                 form_input_field_class={"form-one-field".to_string()}
-                form_input_label_class={"".to_string()}
-                form_input_input_class={"".to_string()}
                 form_input_error_class={"error-txt".to_string()}
                 required={true}
                 input_valid_handle={password_valid_handle}
